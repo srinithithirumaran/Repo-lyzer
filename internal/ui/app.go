@@ -951,6 +951,28 @@ func (m MainModel) analyzeRepo(ctx context.Context, repoName string) tea.Cmd {
 			hotspots,
 		)
 
+		// Fetch issues and PRs
+		issues, issuesErr := client.GetIssues(parts[0], parts[1], "open")
+		if issuesErr != nil {
+			issues = []github.Issue{}
+		}
+
+		prs, prsErr := client.GetPullRequests(parts[0], parts[1], "open")
+		if prsErr != nil {
+			prs = []github.PullRequest{}
+		}
+
+		hasLockFile := deps != nil && deps.HasLockFile
+		maintainerAnalysis := analyzer.AnalyzeMaintainerDashboard(
+			repo,
+			prs,
+			issues,
+			score,
+			busFactor,
+			hasLockFile,
+			contributors,
+		)
+
 		result := AnalysisResult{
 			Repo:                repo,
 			Commits:             commits,
@@ -968,6 +990,9 @@ func (m MainModel) analyzeRepo(ctx context.Context, repoName string) tea.Cmd {
 			ContributorActivity: analyzer.AnalyzeContributorActivity(commits),
 			RiskAlerts:          riskAlerts,
 			QualityDashboard:    qualityDashboard,
+			Issues:              issues,
+			PRs:                 prs,
+			MaintainerAnalysis:  maintainerAnalysis,
 		}
 
 		// Save to cache
