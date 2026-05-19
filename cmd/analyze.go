@@ -170,9 +170,9 @@ var analyzeCmd = &cobra.Command{
 
 		// Create overall progress tracker for all analysis steps
 		// Estimated steps: repo info, languages, commits, file tree, health,
-		// contributors, bus factor, maturity, hotspots = 9 steps
-		// If contribute flag is set, we add 1 step for fetching issues = 10 steps
-		steps := 9
+		// contributors, bus factor, maturity = 8 steps
+		// If contribute flag is set, we add 1 step for fetching issues = 9 steps
+		steps := 8
 		if contribute {
 			steps++
 		}
@@ -354,19 +354,7 @@ var analyzeCmd = &cobra.Command{
 		if contribute {
 			output.PrintContributionScore(contribScore)
 		}
-		output.PrintGitHubAPIStatus(client)
 		output.PrintRecruiterSummary(recruiterSummary)
-
-		// Analyze and print hotspots
-		overallProgress.StartStep("🔥 Identifying code hotspots")
-		hotspots, err := analyzer.AnalyzeHotspots(repoInfo, commits, fileTree, client)
-		if err == nil {
-			overallProgress.CompleteStep("Code hotspots identified")
-			output.PrintHotspots(hotspots)
-		} else {
-			overallProgress.CompleteStep("Hotspot analysis skipped")
-			fmt.Printf("\n⚠️ Could not analyze hotspots: %v\n", err)
-		}
 
 		// Mark analysis as complete
 		overallProgress.Finish()

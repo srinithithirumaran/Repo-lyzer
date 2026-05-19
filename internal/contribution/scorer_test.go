@@ -39,26 +39,9 @@ func TestCalculate(t *testing.T) {
 		},
 	}
 	// Mock commits: recent one
-	commits := []github.Commit{
-		{
-			Commit: struct {
-				Author struct {
-					Name  string    `json:"name"`
-					Email string    `json:"email"`
-					Date  time.Time `json:"date"`
-				} `json:"author"`
-				Message string `json:"message"`
-			}{
-				Author: struct {
-					Name  string    `json:"name"`
-					Email string    `json:"email"`
-					Date  time.Time `json:"date"`
-				}{
-					Date: now.Add(-2 * time.Hour),
-				},
-			},
-		},
-	}
+	var mockCommit github.Commit
+	mockCommit.Commit.Author.Date = now.Add(-2 * time.Hour)
+	commits := []github.Commit{mockCommit}
 	contributors := []github.Contributor{
 		{Login: "dev1", Commits: 100},
 	}
